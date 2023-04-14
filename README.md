@@ -1,16 +1,16 @@
-# Function App with Private HTTP Endpoint
+# Open AI Playground Deployment
 
-Private endpoints for Azure Functions enable access to a Function App within a specified virtual network and restrict public internet access to it. Only clients which are connected to the virtual network are able to access the Function App. HTTP requests that originate from outside the virtual network address space are unable to reach the Function App.
+The goal of this POC enviornment is to provide a secure environment for testing the Open AI service.  The POC allows for an input file to be dropped into the inputs folder in the public storage account.  This storage account is publicly accessible but restricted by IP address and Azure AD authentication.  Once an input file has been deposited a function app will pick up thsi event and pass the input file to the Open AI service to be categorised.  The output of this categorisation will be inserted into CosmosDB where it can later be queried using Power BI.
 
 ## Features
 
 This project framework provides the following features:
 
-* A Function App with a basic .NET HTTP triggered Azure Function.
+* A Function App with a basic Python HTTP triggered Azure Function.
 * An Azure Virtual Network, Private Endpoint, and related resources that restrict access to the Function App.
 * An Azure Key Vault instance used to securely store all secret values.
 * Private Endpoints and network access controls that restrict access to the Storage Account and Key Vault.
-* All components are deployable via Bicep or Terraform.
+* All components are deployable via Bicep.
 
 ## Architecture
 
@@ -35,13 +35,6 @@ The project can be deployed using _either_ Bicep _or_ Terraform.
 2. The [azuredeploy.parameters.json](./IaC/bicep/azuredeploy.parameters.json) file contains the necessary variables to deploy the Bicep project. Update the file with appropriate values. Descriptions for each parameter can be found in the [main.bicep](./IaC/bicep/main.bicep) file.
 3. Optionally, verify what Bicep will deploy, passing in the name of the resource group created earlier and the necessary parameters for the Bicep template - `az deployment group what-if --resource-group <RESOURCE_GROUP_NAME> --template-file .\main.bicep --parameters .\azuredeploy.parameters.json`
 4. Deploy the template, passing in the name of the resource group created earlier and the necessary parameters for the Bicep template - `az deployment group create --resource-group <RESOURCE_GROUP_NAME> --template-file .\main.bicep --parameters .\azuredeploy.parameters.json`
-
-#### Terraform
-
-1. The [terraform.tfvars](./IaC/terraform/terraform.tfvars) file contains the necessary variables to apply the Terraform configuration. Update the file with appropriate values. Descriptions for each variable can be found in the [variables.tf](./IaC/terraform/variables.tf) file.
-2. Initialize Terraform - `terraform init`
-3. Optionally, verify what Terraform will deploy - `terraform plan`
-4. Deploy the configuration - `terraform apply`
 
 ### Deploy the Function App Code
 
