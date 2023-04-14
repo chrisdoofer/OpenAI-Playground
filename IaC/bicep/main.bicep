@@ -9,6 +9,9 @@ param vmAdminUsername string
 @secure()
 param vmAdminPassword string
 
+@description('Specifies the IP address for the storage account ACL rules.')
+param pubsaACLIP string
+
 // Ensure that a user-provided value is lowercase.
 var baseName = toLower(uniqueString(resourceGroup().id))
 
@@ -76,6 +79,14 @@ module storageAccount './modules/private-storage.bicep' = {
   }
 }
 
+module pubstorage './modules/public-storage.bicep' = {
+  name: 'PublicStorageDeploy'
+  params: {
+    location: location
+    saACLIP: pubsaACLIP
+  }
+}
+
 module keyVault './modules/private-key-vault.bicep' = {
   name: 'keyVaultDeploy'
   params: {
@@ -122,7 +133,7 @@ resource additionalAppSettings 'Microsoft.Web/sites/config@2021-01-15' = {
     AzureWebJobsStorage: '@Microsoft.KeyVault(SecretUri=${storageAccount.outputs.storageAccountConnectionStringSecretUriWithVersion})'
     APPINSIGHTS_INSTRUMENTATIONKEY: '@Microsoft.KeyVault(SecretUri=${appInsightsInstrumentationKeyKeyVaultSecret.properties.secretUriWithVersion})'
     FUNCTIONS_EXTENSION_VERSION: '~4'
-    FUNCTIONS_WORKER_RUNTIME: 'dotnet'
+    FUNCTIONS_WORKER_RUNTIME: 'python'
     WEBSITE_SKIP_CONTENTSHARE_VALIDATION: '1'
     WEBSITE_CONTENTAZUREFILECONNECTIONSTRING: '@Microsoft.KeyVault(SecretUri=${storageAccount.outputs.storageAccountConnectionStringSecretUriWithVersion})'
     WEBSITE_CONTENTSHARE: fileShareName
