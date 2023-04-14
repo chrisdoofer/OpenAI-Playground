@@ -12,6 +12,12 @@ param vmAdminPassword string
 @description('Specifies the IP address for the storage account ACL rules.')
 param pubsaACLIP string
 
+@description('Specifies the name for your openAI account.')
+param openaiAccountName string
+
+@description('Specifies the SKU for your openAI account.')
+param openaiAccountSku string
+
 // Ensure that a user-provided value is lowercase.
 var baseName = toLower(uniqueString(resourceGroup().id))
 
@@ -120,6 +126,15 @@ module azureFunction './modules/azure-functions.bicep' = {
     vnetRouteAllEnabled: false
     resourceBaseName: baseName
     azureFunctionAppName: azureFunctionAppName
+  }
+}
+
+module openAIAccount './modules/openAI.bicep' = {
+  name: 'OpenAIDeploy'
+  params: {
+    location: location
+    openaiAccName:openaiAccountName
+    sku:openaiAccountSku
   }
 }
 
